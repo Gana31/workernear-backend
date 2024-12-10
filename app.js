@@ -2,6 +2,9 @@ import express from 'express'
 import ServerConfig from './config/ServerConfig.js';
 import cookieParser from 'cookie-parser';
 import cors from 'cors'
+import { userRouter } from './src/User/index.js';
+import ErrorHandler from './utils/ErrorHandler.js';
+import { ApiError } from './utils/ApiError.js';
 
 const app = express();
 
@@ -14,11 +17,12 @@ app.use(cors({
     credentials : true,
 }));
 app.use(cookieParser());
+app.use("/api/v1",userRouter);
 
 app.get("/",(req,res)=>{
 return res.status(200).json({message : "Your APi is Running "})
 })
-
+app.use(ErrorHandler);
 app.all("*",(req,res)=>{
     return res.status(404).json({message:"no Page Found check your url"})
 })

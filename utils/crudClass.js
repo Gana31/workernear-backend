@@ -1,4 +1,5 @@
-import { ApiError } from "./ApiError.js";
+// CrudRepository.js
+import { ApiError } from "./ApiError.js"; // Import your custom error class
 
 class CrudRepository {
     constructor(model) {
@@ -10,58 +11,65 @@ class CrudRepository {
             const createdRecord = await this.model.create(data);
             return createdRecord;
         } catch (error) {
-            console.log("from the curdddd",error)
-            // console.log("form the curdrepostioty",error.errors[0].message)
-            throw new ApiError(400, error.errors[0].message ||  error.message  || 'Error creating record',"From Base Layer",error.errors || error);
+            // Throw a new ApiError for consistency
+            throw new ApiError(500, error.message || 'Error creating record', error);
         }
     }
 
-    async findById(id,options = {}) {
+    async findById(id, options = {}) {
         try {
-            const record = await this.model.findByPk(id,options);
-            console.log(record)
+            const record = await this.model.findByPk(id, options);
+            if (!record) {
+                throw new ApiError(404, `Record with id ${id} not found`);
+            }
             return record;
         } catch (error) {
-            console.log(error)
-            throw new ApiError(400, error.errors[0]?.message ||  error.message  || 'Error fetching record',"From Base Layer", error.errors || error);
+            throw new ApiError(500, 'Error fetching record by ID', error);
         }
     }
-  
+
     async findAll(options = {}) {
         try {
             const records = await this.model.findAll(options);
             return records;
         } catch (error) {
-            console.log(error)
-            throw new ApiError(400, 'Error fetching records', error.errors);
+            throw new ApiError(500, 'Error fetching all records', error);
         }
     }
+
     async update(id, data) {
         try {
             const [updated] = await this.model.update(data, { where: { id } });
+            if (!updated) {
+                throw new ApiError(404, `Record with id ${id} not found`);
+            }
             return await this.findById(id);
         } catch (error) {
-            console.log(error)
-            throw new ApiError(400, 'Error updating record', error.errors);
+            throw new ApiError(500, 'Error updating record', error);
         }
     }
 
     async delete(id) {
         try {
             const deleted = await this.model.destroy({ where: { id } });
-            return { message: 'Record deleted successfully',deleted };
+            if (!deleted) {
+                throw new ApiError(404, `Record with id ${id} not found`);
+            }
+            return { message: 'Record deleted successfully', deleted };
         } catch (error) {
-            throw new ApiError(400, error.errors[0]?.message ||  error.message  || 'Error deleting record',"From Base Layer", error.errors || error);
+            throw new ApiError(500, 'Error deleting record', error);
         }
     }
 
     async findByEmail(email) {
         try {
             const record = await this.model.findOne({ where: { email } });
+            if (!record) {
+               return null
+            }
             return record;
         } catch (error) {
-            console.log("error form the curdclass",error)
-            throw new ApiError(400, 'Error fetching user by email', error.errors);
+            throw new ApiError(500, error.message || 'Error fetching user by email', error);
         }
     }
 
@@ -71,9 +79,12 @@ class CrudRepository {
                 where,
                 include: relationship,
             });
+            if (!record) {
+                throw new ApiError(404, 'Record not found with the given relation');
+            }
             return record;
         } catch (error) {
-            throw new ApiError(400, 'Error fetching records with relation', error.errors);
+            throw new ApiError(500, 'Error fetching records with relation', error);
         }
     }
 }

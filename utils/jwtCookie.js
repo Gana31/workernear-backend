@@ -3,7 +3,6 @@ import ServerConfig from "../config/ServerConfig.js";
 
 
 export const generateTokensAndSetCookies = (user1, res) => {
-
   const accessToken = jwt.sign({ userId: user1.id }, ServerConfig.ACCESS_TOKEN_SECRET, {
     expiresIn: ServerConfig.ACCESS_TOKEN_EXPIRY || '1d', 
   });
@@ -29,8 +28,8 @@ export const generateTokensAndSetCookies = (user1, res) => {
     sameSite: 'none',
     secure:  ServerConfig.NODE_ENV == 'production',
   });
-  console.log("form the jwtcookeis",user1)
-  return {user1,accessToken} 
+  // console.log("form the jwtcookeis",user1)
+  return {user1} 
 };
 
 

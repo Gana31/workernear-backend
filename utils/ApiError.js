@@ -2,8 +2,6 @@ class ApiError extends Error {
     constructor(
         statusCode,
         message= "Something went wrong",
-        layer,
-        errors = [],
         stack = ""
     ){
         super(message)
@@ -11,8 +9,7 @@ class ApiError extends Error {
         this.data = null
         this.message = message
         this.success = false;
-        this.layer = layer || 'Unknown Layer';
-        this.errors = errors
+
 
         if (stack) {
             this.stack = stack

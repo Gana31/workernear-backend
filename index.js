@@ -1,6 +1,7 @@
 import app from "./app.js";
 import { connectDatabase } from "./config/databaseconfig.js";
 import ServerConfig from "./config/ServerConfig.js";
+import { ApiError } from "./utils/ApiError.js";
 
 
 
@@ -14,8 +15,8 @@ const serverstart = async () => {
         })
 
     } catch (error) {
-        console.log(error);
-        throw error;
+        // console.log(error);
+        throw new ApiError(400,error.message);
     }
 }
 
