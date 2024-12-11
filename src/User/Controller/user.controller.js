@@ -2,7 +2,8 @@
 import { ApiError } from "../../../utils/ApiError.js";
 import { ApiResponse } from "../../../utils/ApiResponse.js";
 import UserService from "../Service/user.service.js";
-
+import {asyncHandler} from '../../../utils/asynchandler.js'
+import ContactModel from "../Models/contactus.model.js";
 class userRegisterController {
 
     userRegister = async (req, res, next) => {
@@ -50,6 +51,31 @@ class userRegisterController {
             next(error);
         }
     }
+
+    Logout = asyncHandler(async(req,res,next)=>{
+        try {
+         
+            res.clearCookie('accessToken');
+            res.clearCookie('refreshToken');
+            res.status(200).json(new ApiResponse(200,"user Logout Successful"));
+        } catch (error) {
+            next(error);
+        }
+    })
+    createContactus = asyncHandler(async (req, res, next) => {
+        try {
+            const { fullname, email, phone,message } = req.body;
+            if (!fullname || !email || !phone || !message) {
+                throw new ApiError(400, "all Fields Are Required for contact")
+            }
+            const contact = await ContactModel.create(req.body);
+
+            
+            res.status(201).json(new ApiResponse(201, 'Response send successfully'));
+        } catch (error) {
+            next(error)
+        }
+    });
 }
 
 export default new userRegisterController();
