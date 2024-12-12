@@ -108,11 +108,6 @@ const UserWorkerModel = sequelize.define('userswork', {
           },
         },
       },
-      
-    gender: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
     refresh_token: {
       type: DataTypes.STRING,
       allowNull: true,
