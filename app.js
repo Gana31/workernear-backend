@@ -4,7 +4,7 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors'
 import { userRouter } from './src/User/index.js';
 import ErrorHandler from './utils/ErrorHandler.js';
-import { ApiError } from './utils/ApiError.js';
+import categoriesRouter from './src/Categories/routes/categories.routes.js';
 
 const app = express();
 
@@ -17,7 +17,7 @@ app.use(cors({
     credentials : true,
 }));
 app.use(cookieParser());
-app.use("/api/v1",userRouter);
+app.use("/api/v1",userRouter,categoriesRouter);
 
 app.get("/",(req,res)=>{
 return res.status(200).json({message : "Your APi is Running "})

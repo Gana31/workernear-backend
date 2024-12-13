@@ -1,5 +1,5 @@
 import CrudRepository from "../../../utils/crudClass.js";
-import UserWorkerModel from "../Models/user.models.js";
+import {UserWorkerModel} from "../../databaseRelations.js";
 
 class UserRepository extends CrudRepository{
    constructor(){
