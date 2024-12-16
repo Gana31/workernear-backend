@@ -1,5 +1,6 @@
 
 import CategoryModel from "./Categories/Models/category.models.js";
+import JobPostModel from "./posts/Models/posts.models.js";
 import UserWorkerModel from "./User/Models/user.models.js";
 
 // Many-to-Many Association
@@ -27,4 +28,15 @@ UserWorkerModel.belongsToMany(CategoryModel, {
   });
   
 
-  export {CategoryModel,UserWorkerModel};
+  UserWorkerModel.hasMany(JobPostModel, {
+    foreignKey: 'createdBy',
+    as: 'jobPosts',
+  });
+  
+  JobPostModel.belongsTo(UserWorkerModel, {
+    foreignKey: 'createdBy',
+    as: 'creator',
+  });
+  
+
+  export {CategoryModel,UserWorkerModel,JobPostModel};
