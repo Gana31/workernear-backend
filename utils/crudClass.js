@@ -12,6 +12,7 @@ class CrudRepository {
             return createdRecord;
         } catch (error) {
             // Throw a new ApiError for consistency
+            console.log(error)
             throw new ApiError(500, error.message || 'Error creating record', error);
         }
     }
@@ -70,6 +71,15 @@ class CrudRepository {
             return record;
         } catch (error) {
             throw new ApiError(500, error.message || 'Error fetching user by email', error);
+        }
+    }
+
+    async findOne(options) {
+        try {
+            const record = await this.model.findOne(options);
+            return record;
+        } catch (error) {
+            throw new ApiError(500, 'Error fetching record by criteria', error);
         }
     }
 

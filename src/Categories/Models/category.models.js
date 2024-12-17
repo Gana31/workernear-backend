@@ -1,5 +1,6 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../../../config/databaseconfig.js';
+import UserWorkerModel  from '../../User/Models/user.models.js';
 
 const CategoryModel = sequelize.define('worknearcategories', {
   id: {
@@ -17,15 +18,23 @@ const CategoryModel = sequelize.define('worknearcategories', {
       notEmpty: { msg: "Category name cannot be empty" },
     },
   },
-  services: {
-    type: DataTypes.TEXT,
-    allowNull: true,
+  createdby: {
+    type: DataTypes.UUID,
+    allowNull: false,
+    references: {
+      model: UserWorkerModel,
+      key: 'id',
+    },
+    onDelete: 'CASCADE', // Deletes job posts if the user is deleted
+    onUpdate: 'CASCADE',
+    validate: {
+      notNull: { msg: 'CreatedBy field is required' },
+    },
   },
 }, {
   tableName: 'worknearcategories',
   timestamps: true,
   underscored: true,
-  paranoid: true, // Enables soft deletes
 });
 
 export default CategoryModel;

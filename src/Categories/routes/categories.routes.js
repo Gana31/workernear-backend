@@ -1,12 +1,14 @@
 import express from 'express'
 import categoryController from '../Controller/category.controller.js';
+import { authMiddleware, requireRole } from '../../Middleware/authMiddleware.js';
 
 
 const categoriesRouter = express.Router();
 
-categoriesRouter.post("/createcategories",categoryController.createCategory);
+categoriesRouter.post("/createcategories",authMiddleware,categoryController.createCategory);
 categoriesRouter.get("/getAllCategories",categoryController.getAllCategories);
-// categoriesRouter.post("/logout",userController.Logout);
-// categoriesRouter.post("/createContactus",userController.createContactus);
+categoriesRouter.get("/getusercategories",authMiddleware,categoryController.getCategoriesByUser);
+categoriesRouter.put("/updatecategories",authMiddleware,categoryController.updateCategory);
+categoriesRouter.post("/deletecategories",authMiddleware,categoryController.deleteCategory);
 
 export default categoriesRouter;
