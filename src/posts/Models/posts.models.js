@@ -11,11 +11,8 @@ const PostModel = sequelize.define('worknearjobposts', {
   },
   title: {
     type: DataTypes.STRING,
-    allowNull: false,
-    validate: {
-      notNull: { msg: "Job title is required" },
-      notEmpty: { msg: "Job title cannot be empty" },
-    },
+    allowNull: true,
+   
   },
   description: {
     type: DataTypes.TEXT,
@@ -24,6 +21,10 @@ const PostModel = sequelize.define('worknearjobposts', {
   image: {
     type: DataTypes.STRING,
     allowNull: true, // For visual mode, this will store the image URL
+  },
+  imagepublicid :{
+    type: DataTypes.STRING,
+    allowNull: true, 
   },
   jobType: {
     type: DataTypes.STRING,
@@ -50,10 +51,6 @@ const PostModel = sequelize.define('worknearjobposts', {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  tags: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
   postMode: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -63,7 +60,7 @@ const PostModel = sequelize.define('worknearjobposts', {
     type: DataTypes.STRING,
     allowNull: true, // Only used for traditional mode
   },
-  mobileNumber: {
+  mobile: {
     type: DataTypes.STRING,
     allowNull: true, // Only used for traditional mode
   },

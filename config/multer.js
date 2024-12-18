@@ -24,12 +24,28 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({
     storage,
     fileFilter,
-    limits: { fileSize: 25 * 1024 * 1024 },  // 25 MB limit
+    limits: { fileSize: 25 * 1024 * 1024 }, 
 }).fields([
-    { name: 'images', maxCount: 10 },  // For up to 10 images
-    { name: 'document', maxCount: 1 }, // For one document (PDF/Word)
+    { name: 'images', maxCount: 10 }, 
+    { name: 'document', maxCount: 1 }, 
 ]);
 
+
+
+const conditionalUploadMiddleware = (req, res, next) => {
+    upload(req, res, (err) => {
+        if (err) {
+            console.error("Multer Error:", err);
+            return next(err);
+        }
+
+        // If no files are uploaded, proceed without errors
+        if (!req.files || Object.keys(req.files).length === 0) {
+            return next();
+        }
+        next();
+    });
+};
 // Debugging middleware to check uploaded files and body
 const debugUploadMiddleware = (req, res, next) => {
     console.log("Multer Files:", req.files);  // Will now log multiple fields (images, document)
@@ -74,4 +90,4 @@ const deleteFromCloudinary = async (publicId) => {
     }
 };
 
-export { upload, uploadToCloudinary, debugUploadMiddleware, deleteFromCloudinary };
+export { upload, uploadToCloudinary, debugUploadMiddleware, deleteFromCloudinary ,conditionalUploadMiddleware};

@@ -29,12 +29,12 @@ UserWorkerModel.belongsToMany(CategoryModel, {
   
 
   UserWorkerModel.hasMany(JobPostModel, {
-    foreignKey: 'createdBy',
+    foreignKey: 'createdby',
     as: 'jobPosts',
   });
   
   JobPostModel.belongsTo(UserWorkerModel, {
-    foreignKey: 'createdBy',
+    foreignKey: 'createdby',
     as: 'creator',
   });
   
