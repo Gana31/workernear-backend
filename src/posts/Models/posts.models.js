@@ -9,6 +9,14 @@ const PostModel = sequelize.define('worknearjobposts', {
     primaryKey: true,
     allowNull: false,
   },
+  name:{
+    type : DataTypes.STRING,
+    allowNull:true,
+  },
+  companyimgae:{
+    type : DataTypes.STRING,
+    allowNull:true,
+  },
   title: {
     type: DataTypes.STRING,
     allowNull: true,
@@ -21,6 +29,10 @@ const PostModel = sequelize.define('worknearjobposts', {
   image: {
     type: DataTypes.STRING,
     allowNull: true, // For visual mode, this will store the image URL
+  },
+  category:{
+    type: DataTypes.STRING,
+    allowNull: true, 
   },
   imagepublicid :{
     type: DataTypes.STRING,

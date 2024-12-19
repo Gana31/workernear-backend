@@ -14,10 +14,10 @@ class PostsController {
       if (!body || Object.keys(body).length === 0) {
         throw new ApiError(400, "Request body cannot be empty");
       }
-
       // Add the ID of the user creating the post
       body.createdby = req.user.id;
-
+      body.companyimgae = body.profilePicture;
+        // console.log(body)
       // Delegate to the service layer for handling all business logic
       const post = await postsService.createPostService(body, files);
 
@@ -42,22 +42,25 @@ class PostsController {
   };
   
   // Update Post
-  updatePost = async (req, res, next) => {
-    try {
+updatePost = async (req, res, next) => {
+  try {
       const { body } = req;
+      const { id } = req.params;
+      const { files } = req;
 
       // Validate input
-      if (!body.id) throw new ApiError(400, "Post ID is required");
+      if (!id) throw new ApiError(400, "Post ID is required");
+      body.id = id;
 
       // Delegate to service layer
-      const updatedPost = await postsService.updatePostService(body);
+      const updatedPost = await postsService.updatePostService(body, files);
 
       // Send response
       res.status(200).json(new ApiResponse(200, "Post updated successfully", updatedPost));
-    } catch (error) {
+  } catch (error) {
       next(error);
-    }
-  };
+  }
+};
 
   // Get All Posts
   getAllPosts = async (req, res, next) => {

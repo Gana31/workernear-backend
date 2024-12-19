@@ -1,4 +1,4 @@
-import { uploadToCloudinary } from "../../../config/multer.js";
+import { deleteFromCloudinary, uploadToCloudinary } from "../../../config/multer.js";
 import { ApiError } from "../../../utils/ApiError.js";
 import { ApiResponse } from "../../../utils/ApiResponse.js";
 import PostsRespository from "../Repository/posts.respository.js";
@@ -33,17 +33,44 @@ class PostsService {
     }
   };
 
-  // Update Post
-  updatePostService = async (data) => {
+  updatePostService = async (data, files) => {
     try {
-      // Concatenate skills array into a string if provided
-   
-      // Update the post in the database
-      return await postsRepository.update(data.id, data);
+        // Retrieve the existing post from the database
+        const existingPost = await postsRepository.findById(data.id);
+        if (!existingPost) throw new ApiError(404, "Post not found");
+
+        // Handle visual mode updates
+        if (data.mode === 'visual') {
+            // Check if new files are provided
+            if (files && files.images && files.images.length > 0) {
+                const newImage = files.images[0];
+
+                // Upload the new image to Cloudinary
+                const cloudinaryResponse = await uploadToCloudinary(newImage, 'jobpostimages');
+
+                // Delete the old image from Cloudinary if it exists
+                if (existingPost.imagepublicid) {
+                    await deleteFromCloudinary(existingPost.imagepublicid);
+                }
+
+                // Update the data with new image details
+                data.imagepublicid = cloudinaryResponse.public_id;
+                data.image = cloudinaryResponse.secure_url;
+            } else {
+                // Ensure existing image is retained if no new image is uploaded
+                data.imagepublicid = existingPost.imagepublicid;
+                data.image = existingPost.image;
+            }
+        }
+
+        // Update the post in the database
+        const updatedPost = await postsRepository.update(data.id, data);
+
+        return updatedPost;
     } catch (error) {
-      throw new Error(error.message || "Error updating post");
+        throw new ApiError(500, error.message || "Error updating post");
     }
-  };
+};
 
   // Get All Posts
   getAllPostsService = async () => {
