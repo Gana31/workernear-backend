@@ -56,6 +56,33 @@ class UserService {
             throw error;  
         }
     }
+
+    updateUserProfile = async (userId, profileData) => {
+        try {
+            const user = await Userrepository.findOne({ where: { id:userId} });
+            if (!user) {
+                throw new ApiError(404, "User not found");
+            }
+            await user.update(profileData);
+
+            return user;
+        } catch (error) {
+            throw error;
+        }
+    };
+
+    getAllUserProfile = async () => {
+        try {
+            const user = await Userrepository.findAll({ where: { availability:"Open to opportunities" || "Available for freelance" || "Looking for full-time"} });
+            if (!user) {
+                throw new ApiError(404, "User not found");
+            }
+
+            return user;
+        } catch (error) {
+            throw error;
+        }
+    };
 }
 
 export default new UserService();

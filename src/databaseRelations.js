@@ -1,5 +1,6 @@
 
 import CategoryModel from "./Categories/Models/category.models.js";
+import JobApplication from "./posts/Models/jobApplication.model.js";
 import JobPostModel from "./posts/Models/posts.models.js";
 import UserWorkerModel from "./User/Models/user.models.js";
 
@@ -38,5 +39,19 @@ UserWorkerModel.belongsToMany(CategoryModel, {
     as: 'creator',
   });
   
+  JobApplication.belongsTo(UserWorkerModel, {
+    foreignKey: 'userId', // This is the field in JobApplication that refers to UserWorkerModel
+    as: 'user', // Alias for the related user
+  });
+  
+  UserWorkerModel.hasMany(JobApplication, {
+    foreignKey: 'userId',
+    as: 'applications', // Alias for the applications of a user
+  });
 
-  export {CategoryModel,UserWorkerModel,JobPostModel};
+  JobApplication.belongsTo(JobPostModel, {
+    foreignKey: 'jobId', // This is the field in JobApplication that refers to JobPostModel
+    as: 'job', // Alias for the related job
+  });
+
+  export {CategoryModel,UserWorkerModel,JobPostModel,JobApplication};

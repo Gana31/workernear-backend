@@ -112,6 +112,47 @@ const UserWorkerModel = sequelize.define('userswork', {
       type: DataTypes.STRING,
       allowNull: true,
     },
+    bio: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    city: {
+      type: DataTypes.STRING,
+      allowNull: true, // Only used for traditional mode
+    },
+    website: {
+      type: DataTypes.STRING,
+      allowNull: true, // Only used for traditional mode
+    },
+    availability: {
+      type: DataTypes.STRING,
+      allowNull: true, // Only used for traditional mode
+    },
+    location: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    experience: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    services: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    category: {
+      type: DataTypes.ARRAY(DataTypes.STRING),
+      allowNull: true,
+    },
+    education: {
+      type: DataTypes.ARRAY(DataTypes.JSONB), // Array of JSON objects for education details
+      allowNull: true,
+      defaultValue: [],
+    },
+    social: {
+      type: DataTypes.JSONB, // JSON object for social media links
+      allowNull: true,
+    },
   }, {
     tableName: 'userswork',
     timestamps: true,

@@ -47,6 +47,7 @@ updatePost = async (req, res, next) => {
       const { body } = req;
       const { id } = req.params;
       const { files } = req;
+      console.log(body)
 
       // Validate input
       if (!id) throw new ApiError(400, "Post ID is required");
@@ -62,17 +63,22 @@ updatePost = async (req, res, next) => {
   }
 };
 
-  // Get All Posts
-  getAllPosts = async (req, res, next) => {
-    try {
-      const posts = await postsService.getAllPostsService();
+// Get All Posts
+getAllPosts = async (req, res, next) => {
+  try {
+    const { keywords, location } = req.query;  // Extract query parameters
+    // console.log(req.query);  // Log for debugging
 
-      // Send response
-      res.status(200).json(new ApiResponse(200, "Posts fetched successfully", posts));
-    } catch (error) {
-      next(error);
-    }
-  };
+    // Pass query parameters to the service layer
+    const posts = await postsService.getAllPostsService({ keywords, location });
+
+    // Send response
+    res.status(200).json(new ApiResponse(200, "Posts fetched successfully", posts));
+  } catch (error) {
+    next(error);
+  }
+};
+
 
   // Get Post by ID
   getPostById = async (req, res, next) => {
@@ -110,7 +116,60 @@ updatePost = async (req, res, next) => {
     }
   };
 
+  applyForJob = async (req, res, next) => {
+    try {
+        const { jobId } = req.body;  // Assuming userId and jobId are sent in the body
+      const userId = req.user.id;
+        // Call the service to apply for the job
+        const application = await postsService.applyForJob(userId, jobId);
 
+        // Send response if the application is successful
+        res.status(200).json(new ApiResponse(200, 'Job applied successfully', application));
+    } catch (error) {
+        next(error);
+    }
+};
+  
+getJobApplications = async (req, res, next) => {
+  try {
+    const { id } = req.params;  // Job ID is passed as a URL parameter
+    // Validate if jobId is provided
+    const jobId = id;
+    console.log(jobId)
+    if (!jobId) {
+      throw new ApiError(400, "Job ID is required");
+    }
+
+    // Get the job applications using the service
+    const applications = await postsService.getJobApplicationsForJob(jobId);
+
+    // Send response
+    res.status(200).json(new ApiResponse(200, "Job applications fetched successfully", applications));
+  } catch (error) {
+    
+    next(error);  // Pass the error to the global error handler
+  }
+};
+
+changeStatus = async (req, res, next) => {
+  try {
+    const { id } = req.params;  // Job ID is passed as a URL parameter
+    const {status} = req.body
+    if (!id) {
+      throw new ApiError(400, "Job ID is required");
+    }
+    console.log(status)
+
+    // Get the job applications using the service
+    const applications = await postsService.changeStatus(id,status);
+
+    // Send response
+    res.status(200).json(new ApiResponse(200, "Job applications fetched successfully", applications));
+  } catch (error) {
+    
+    next(error);  // Pass the error to the global error handler
+  }
+};
  
 }
 

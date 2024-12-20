@@ -76,6 +76,33 @@ class userRegisterController {
             next(error)
         }
     });
+
+    createprofile = asyncHandler(async (req, res, next) => {
+        try {
+            const profileData = req.body;
+            // console.log(req.body)
+        // Validate and update profile in the service layer
+        const updatedUser = await UserService.updateUserProfile(req.user.id, profileData);
+
+            // console.log(req.body);            
+            res.status(200).json(new ApiResponse(200, "Profile updated successfully", updatedUser));
+        } catch (error) {
+            next(error)
+        }
+    });
+
+    getAllUser = asyncHandler(async (req, res, next) => {
+        try {
+          
+
+        const userprofile = await UserService.getAllUserProfile();
+
+            // console.log(req.body);            
+            res.status(200).json(new ApiResponse(200, "Profile fetch successfully", userprofile));
+        } catch (error) {
+            next(error)
+        }
+    });
 }
 
 export default new userRegisterController();
