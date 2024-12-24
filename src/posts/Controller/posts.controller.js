@@ -35,7 +35,7 @@ class PostsController {
       if (posts.length > 0) {
         return res.status(200).json(new ApiResponse(200, "Post found successfully", posts));
       }
-      return res.status(200).json(new ApiResponse(200, "No Post found"));
+      return res.status(200).json(new ApiResponse(200, "No Post found",posts));
     } catch (error) {
       next(error); // Pass the error to the global error handler
     }
@@ -66,11 +66,12 @@ updatePost = async (req, res, next) => {
 // Get All Posts
 getAllPosts = async (req, res, next) => {
   try {
+    const id = req.user?.id;
     const { keywords, location } = req.query;  // Extract query parameters
     // console.log(req.query);  // Log for debugging
 
     // Pass query parameters to the service layer
-    const posts = await postsService.getAllPostsService({ keywords, location });
+    const posts = await postsService.getAllPostsService({ keywords, location ,id });
 
     // Send response
     res.status(200).json(new ApiResponse(200, "Posts fetched successfully", posts));
@@ -154,14 +155,13 @@ getJobApplications = async (req, res, next) => {
 changeStatus = async (req, res, next) => {
   try {
     const { id } = req.params;  // Job ID is passed as a URL parameter
-    const {status} = req.body
+    const {status,jobTitle,companyName,userEmail} = req.body
     if (!id) {
       throw new ApiError(400, "Job ID is required");
     }
-    console.log(status)
 
     // Get the job applications using the service
-    const applications = await postsService.changeStatus(id,status);
+    const applications = await postsService.changeStatus(id,status,jobTitle,companyName,userEmail);
 
     // Send response
     res.status(200).json(new ApiResponse(200, "Job applications fetched successfully", applications));

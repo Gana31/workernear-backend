@@ -93,12 +93,28 @@ class userRegisterController {
 
     getAllUser = asyncHandler(async (req, res, next) => {
         try {
-          
+          const userid = req.user?.id;
 
-        const userprofile = await UserService.getAllUserProfile();
-
+        const userprofile = await UserService.getAllUserProfile(userid);
+            if(!userprofile || userprofile.length == 0 ){
+                 return res.status(200).json(new ApiResponse(200, " No Profile Found",userprofile));
+            }
             // console.log(req.body);            
-            res.status(200).json(new ApiResponse(200, "Profile fetch successfully", userprofile));
+            return res.status(200).json(new ApiResponse(200, "Profile fetch successfully", userprofile));
+        } catch (error) {
+            next(error)
+        }
+    });
+    getUserProfile = asyncHandler(async (req, res, next) => {
+        try {
+          const {id} = req.body;
+
+        const userprofile = await UserService.getUserProfile(id);
+            if(!userprofile || userprofile.length == 0 ){
+                 return res.status(200).json(new ApiResponse(200, " No Profile Found",userprofile));
+            }
+            // console.log(req.body);            
+            return res.status(200).json(new ApiResponse(200, "Profile fetch successfully", userprofile));
         } catch (error) {
             next(error)
         }

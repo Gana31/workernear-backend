@@ -1,6 +1,7 @@
 import { deleteFromCloudinary, uploadToCloudinary } from "../../../config/multer.js";
 import { ApiError } from "../../../utils/ApiError.js";
 import { ApiResponse } from "../../../utils/ApiResponse.js";
+import { sendMail } from "../../../utils/sendEmail.js";
 import { UserWorkerModel } from "../../databaseRelations.js";
 import UserRepository from "../../User/Repository/user.respository.js";
 import PostModel from "../Models/posts.models.js";
@@ -79,17 +80,17 @@ class PostsService {
 
 
 
-// Get All Posts with Filters
-getAllPostsService = async ({ keywords, location }) => {
+// Get All Posts with Filters and Applied Status
+getAllPostsService = async ({ keywords, location, id }) => {
   try {
-    // Build a filter object
+    // Build a filter object for fetching posts
     const filter = {
-      postMode: 'Public'  // Only fetch public posts
+      postMode: 'Public', // Only fetch public posts
+      createdby: { [Op.ne]: id } // Exclude posts created by the user
     };
 
     // If `keywords` is provided, filter by title, skills, or category
     if (keywords) {
-      // Use the `$or` operator to search across multiple fields
       filter[Op.or] = [
         { title: { [Op.iLike]: `%${keywords}%` } },  // Case-insensitive search for title
         { skills: { [Op.iLike]: `%${keywords}%` } }, // Case-insensitive search for skills
@@ -106,14 +107,34 @@ getAllPostsService = async ({ keywords, location }) => {
       );
     }
 
-    // Query the posts from the repository with the filter
+    // Query all posts based on the filters
     const posts = await postsRepository.findAll({
       where: filter
     });
 
-    return posts;
+    // Check if the user has applied for any of the fetched posts
+    const jobApplications = await jobRespository.findAll({
+      where: {
+        userId: id,
+        jobId: posts.map(post => post.id)  // Get applications for the posts the user is interested in
+      }
+    });
+
+    // Create a set of applied job IDs for easier lookup
+    const appliedJobIds = new Set(jobApplications.map(app => app.jobId));
+
+    // Add `applied` field to each post
+    const postsWithAppliedStatus = posts.map(post => {
+      const isApplied = appliedJobIds.has(post.id); // Check if the user has applied for this post
+      return {
+        ...post.toJSON(),
+        applied: isApplied // Add the `applied` field
+      };
+    });
+
+    return postsWithAppliedStatus;
   } catch (error) {
-    throw new Error(error.message || "Error fetching posts with filters");
+    throw new Error(error.message || "Error fetching posts with filters and application status");
   }
 };
 
@@ -218,7 +239,7 @@ getJobApplicationsForJob = async (jobId) => {
   }
 };
 
-async changeStatus(jobId, status) {
+async changeStatus(jobId, status,jobTitle,companyName,userEmail) {
   try {
     // Step 1: Find the application by jobId
     const application = await jobRespository.findOne({ where: { id: jobId } });
@@ -226,6 +247,7 @@ async changeStatus(jobId, status) {
     if (!application) {
       throw new ApiError(404, 'Job application not found');
     }
+    
 
     // Step 2: Update the status of the job application
     application.status = status;
@@ -248,6 +270,25 @@ async changeStatus(jobId, status) {
       ]
     });
 
+    if(status == "reject"){
+      sendMail({
+          email: userEmail,
+          subject: "Job Application Result",
+          isSelected: false, // true for selection, false for rejection
+          jobTitle: jobTitle,
+          companyName:companyName
+        });
+    }
+    else{
+      sendMail({
+        email: userEmail,
+        subject: "Job Application Result",
+        isSelected: true, // true for selection, false for rejection
+        jobTitle: jobTitle,
+        companyName:companyName
+      });
+    }
+    // 
     // Step 4: Return the updated application details in a structured format
     return {
       userId: updatedApplication.userId,

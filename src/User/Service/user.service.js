@@ -1,4 +1,5 @@
 // UserService.js
+import { Op } from "sequelize";
 import { ApiError } from "../../../utils/ApiError.js";
 import { generateTokensAndSetCookies } from "../../../utils/jwtCookie.js";
 import UserRepository from "../Repository/user.respository.js";
@@ -71,18 +72,45 @@ class UserService {
         }
     };
 
-    getAllUserProfile = async () => {
+    getAllUserProfile = async (userid) => {
         try {
-            const user = await Userrepository.findAll({ where: { availability:"Open to opportunities" || "Available for freelance" || "Looking for full-time"} });
-            if (!user) {
-                throw new ApiError(404, "User not found");
-            }
-
-            return user;
+            const users = await Userrepository.findAll({
+                where: {
+                    availability: {
+                        [Op.or]: [
+                            "Open to opportunities",
+                            "Available for freelance",
+                            "Looking for full-time",
+                        ],
+                    },
+                    id: { [Op.ne]: userid }, // Exclude the profile of the given userid
+                },
+            });
+    
+            return users;
         } catch (error) {
             throw error;
         }
     };
+
+    getUserProfile = async (userid) => {
+        try {
+            const users = await Userrepository.findOne({
+                where: {
+                    id:userid , // Exclude the profile of the given userid
+                },
+            });
+            if(users.refresh_token != null){
+                 users.refresh_token = ""
+            }
+            
+            // console.log(users);
+            return users;
+        } catch (error) {
+            throw error;
+        }
+    };
+    
 }
 
 export default new UserService();

@@ -116,6 +116,10 @@ const UserWorkerModel = sequelize.define('userswork', {
       type: DataTypes.TEXT,
       allowNull: true,
     },
+    role: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     city: {
       type: DataTypes.STRING,
       allowNull: true, // Only used for traditional mode
@@ -130,6 +134,10 @@ const UserWorkerModel = sequelize.define('userswork', {
     },
     location: {
       type: DataTypes.STRING,
+      allowNull: true,
+    },
+    phone: {
+      type: DataTypes.NUMBER,
       allowNull: true,
     },
     experience: {
